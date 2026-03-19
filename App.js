@@ -1,8 +1,9 @@
 import React, {Component} from "react";
 import BottomTabNavigator from "./components/BottomTabNavigator";
 import {Rajdhani_600SemiBold} from "@expo-google-fonts/rajdhani";
-import * as font from "expo-font";
+import * as Font from "expo-font";
 import { LogBox } from "react-native";
+import { NavigationContainer } from "@react-navigation/native";
 
 LogBox.ignoreAllLogs();
 
@@ -27,10 +28,11 @@ export default class App extends Component{
 
 
   render () {
-    const {fontLoaded} = this.state;
-    if (fontLoaded){
-      return<BottomTabNavigator/>
-    }
-    return null
+    if(!this.state.fontLoaded)return null
+      return(
+      <NavigationContainer><BottomTabNavigator/></NavigationContainer>
+      )
+    
+    
   }
 }

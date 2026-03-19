@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import {View, Text, StyleSheet, TouchableOpacity, ToastAndroid, Alert, KeyboardAvoidingView} from "react-native"
-import * as Permissions from "expo-permissions"
+
 import {BarCodeScanner} from "expo-barcode-scanner"
 import db from "../config"
 import firebase from "firebase"
@@ -21,7 +21,7 @@ export default class TransactionScreen extends Component{
   };
 
   getCameraPermission = async domState => {
-    const { status } = await Permissions.askAsync(Permissions.CAMERA);
+    const {status} = await BarCodeScanner.requestPermissionsAsync();
 
     this.setState({
       hasCameraPermissions : status === "granted",
