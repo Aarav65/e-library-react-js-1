@@ -220,5 +220,40 @@ const styles = StyleSheet.create({
     borderBottonRightRadius:10,
     justifyContent: "center",
     alignItems:"center"
+  },
+  scanbuttonText:{
+    fontSize : 24,
+    color : "black",
+    fontFamily : "Rajdhani_600SemiBold",
+  },
+  lowerContainer:{
+    flex:0.8,
+    backgroundColor:"white",
+  },
+  title:{
+    fontSize:20,
+    fontFamily:"Rajdhani_600SemiBold"
+  },
+  subtitle:{
+    fontSize:16,
+    fontFamily:"Rajdhani_600SemiBold"
+  },
+  lowerLeftContainer:{
+    alignSelf:"flex-end",
+    marginTop:-40
+  },
+  transactionContainer:{
+    alignSelf:"flex-end",
+    justifyContent:"space-evenly",
+    alignItems:"center"
+  },
+  transactionText:{
+    fontSize:20,
+    fontFamily:"Rajdhani_600SemiBold"
+  },
+  date:{
+    fontFamily:"Rajdhani_600SemiBold",
+    fontSize:12,
+    paddingTop:5
   }
 })
