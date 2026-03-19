@@ -1,21 +1,28 @@
-import React, {Component} from "react";
-import {View, Text, StyleSheet, TouchableOpacity} from "react-native"
-import { TextInput } from "react-native-gesture-handler";
+import React, { Component } from "react";
+import {
+  View,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  Text,
+  FlatList
+} from "react-native";
+import { Avatar, ListItem, Icon } from "react-native-elements";
+import db from "../config";
 
-export default class SearchScreen extends Component{
-  constructor (props){
+export default class SearchScreen extends Component {
+  constructor(props) {
     super(props);
     this.state = {
-      allTransactions : [],
-      lastVisibleTransaction : null,
-      searchText : ""
+      allTransactions: [],
     };
-  };
+  }
 
-  componentDidMount = async() => {
+  componentDidMount = async () => {
     this.getTransactions();
   };
 
+  //Bp
   getTransactions = () => {
     db.collection("transactions")
       .limit(10)
@@ -23,128 +30,141 @@ export default class SearchScreen extends Component{
       .then(snapshot => {
         snapshot.docs.map(doc => {
           this.setState({
-            allTransactions : [...this.state.allTransactions, doc.data()],
-            lastVisibleTransaction : doc
+            allTransactions: [...this.state.allTransactions, doc.data()],
+            lastVisibleTransaction: doc
           });
         });
       });
   };
-};
 
-handleSearch = async text => {
-  var enterdText = text.toUpperCase().split("");
-  text = text.toUpperCase();
-  this.setState({
-    allTransactions : []
-  });
-  if(!text){
-    this.getTransactions();
-  }
-
-  if(enterdText[0] === "B"){
-    db.collection("transactions")
-      .where("book_id","==",text)
-      .get()
-      .then(snapshot => {
-        snapshot.docs.map(doc => {
-          this.setState({
-            allTransactions : [...this.state.allTransactions, doc.data()],
-            lastVisibleTransaction : doc
-          });
-        });
-      });
-  }else if(enterdText[0] === "S"){
-    db.collection("transactions")
-      .where("student_id","==",text)
-      .get()
-      .then(snapshot => {
-        snapshot.docs.map(doc => {
-          this.setState({
-            allTransactions : [...this.state.allTransactions, doc.data()],
-            lastVisibleTransaction : doc
-          });
-        });
-      });
-  }
-};
-
-fetchMoreTransactions = async text => {
-  var enterdText = text.toUpperCase().split("");
-  text = text.toUpperCase();
-
-  const {allTransactions, lastVisibleTransaction} = this.state;
-  if(enterdText[0] === "B"){
-    const query = await db
-      .collection("transactions")
-      .where("book_id","==",text)
-      .startAfter(lastVisibleTransaction)
-      .limit(10)
-      .get()
-  query.docs.map(doc => {
+  //TA
+  handleSearch = async text => {
+    var enteredText = text.toUpperCase().split("");
+    text = text.toUpperCase();
     this.setState({
-      allTransactions : [...this.state.allTransactions, doc.data()],
-      lastVisibleTransaction : doc
+      allTransactions: []
     });
-  });
-  } else if(enterdText[0] === "S"){
-    const query = await db
-    .collection("transactions")
-    .where("student_id","==",text)
-    .startAfter(lastVisibleTransaction)
-    .limit(10)
-    .get()
-   query.docs.map(doc => {
-  this.setState({
-    allTransactions : [...this.state.allTransactions, doc.data()],
-    lastVisibleTransaction : doc
-  });
-});
+    if (!text) {
+      this.getTransactions();
+    }
+
+    if (enteredText[0] === "B") {
+      db.collection("transactions")
+        .where("book_id", "==", text)
+        .get()
+        .then(snapshot => {
+          snapshot.docs.map(doc => {
+            this.setState({
+              allTransactions: [...this.state.allTransactions, doc.data()],
+              lastVisibleTransaction: doc
+            });
+          });
+        });
+    } else if (enteredText[0] === "S") {
+      db.collection("transactions")
+        .where("student_id", "==", text)
+        .get()
+        .then(snapshot => {
+          snapshot.docs.map(doc => {
+            this.setState({
+              allTransactions: [...this.state.allTransactions, doc.data()],
+              lastVisibleTransaction: doc
+            });
+          });
+        });
+    }
   };
 
-  renderItem = ({item, i}) => {
+  //SA
+  fetchMoreTransactions = async text => {
+    var enteredText = text.toUpperCase().split("");
+    text = text.toUpperCase();
+
+    const { lastVisibleTransaction, allTransactions } = this.state;
+    if (enteredText[0] === "B") {
+      const query = await db
+        .collection("transactions")
+        .where("bookId", "==", text)
+        .startAfter(lastVisibleTransaction)
+        .limit(10)
+        .get();
+      query.docs.map(doc => {
+        this.setState({
+          allTransactions: [...this.state.allTransactions, doc.data()],
+          lastVisibleTransaction: doc
+        });
+      });
+    } else if (enteredText[0] === "S") {
+      const query = await db
+        .collection("transactions")
+        .where("bookId", "==", text)
+        .startAfter(this.state.lastVisibleTransaction)
+        .limit(10)
+        .get();
+      query.docs.map(doc => {
+        this.setState({
+          allTransactions: [...this.state.allTransactions, doc.data()],
+          lastVisibleTransaction: doc
+        });
+      });
+    }
+  };
+
+  renderItem = ({ item, i }) => {
     var date = item.date
       .toDate()
       .toString()
       .split(" ")
       .splice(0, 4)
       .join(" ");
-      
-      var transactionType = item.transaction_type === "issue" ? "issued" : "returned";
 
-      return(
-        <View style={{borderWidth : 1}}>
-          <ListItem key={i} bottomDivider>
-            <Icon type={"antdesign"} name = {"book"} size = {40}>
-              <ListItem.Content>
-                <ListItem.Title style = {styles.title}>
-                  {`${item.book_name} (${item.book_id})`}
-                </ListItem.Title>
-                <ListItem.Subtitle style = {styles.subtitle}>
-                {`This book ${transactionType} by ${item.student_name}`}
-                </ListItem.Subtitle>
-                <View style = {styles.lowerLeftContainer}>
-                  <View style = {styles.transactionContainer}>
-                    <Text 
-                    style = {[
-                      styles.transactionText,
-                      {
-                        color : item.transaction_type === "issue" ? "green" : "blue"
-                      }
-                    ]}>
-                      {item.transaction_type.charAt(0).toUpperCase() + item.transaction_type.splice(1)}
-                    </Text>
-                    <Icon 
-                    type = {"ionicon"}
-                    name = {item.transaction_type === "issue" ? "checkmark-circle-outline" : "arrow-redo-circle-outline"}
-                    color = {item.transaction_type === "issue" ? "green" : "blue"}/>
-                  </View>
-                  <Text style = {styles.date}>{date}</Text>
-                </View>
-              </ListItem.Content>
-            </Icon>
-          </ListItem>
-        </View>
-      )
+    var transactionType =
+      item.transaction_type === "issue" ? "issued" : "returned";
+    return (
+      <View style={{ borderWidth: 1 }}>
+        <ListItem key={i} bottomDivider>
+          <Icon type={"antdesign"} name={"book"} size={40} />
+          <ListItem.Content>
+            <ListItem.Title style={styles.title}>
+              {`${item.book_name} ( ${item.book_id} )`}
+            </ListItem.Title>
+            <ListItem.Subtitle style={styles.subtitle}>
+              {`This book ${transactionType} by ${item.student_name}`}
+            </ListItem.Subtitle>
+            <View style={styles.lowerLeftContaiiner}>
+              <View style={styles.transactionContainer}>
+                <Text
+                  style={[
+                    styles.transactionText,
+                    {
+                      color:
+                        item.transaction_type === "issue"
+                          ? "#78D304"
+                          : "#0364F4"
+                    }
+                  ]}
+                >
+                  {item.transaction_type.charAt(0).toUpperCase() +
+                    item.transaction_type.slice(1)}
+                </Text>
+                <Icon
+                  type={"ionicon"}
+                  name={
+                    item.transaction_type === "issue"
+                      ? "checkmark-circle-outline"
+                      : "arrow-redo-circle-outline"
+                  }
+                  color={
+                    item.transaction_type === "issue" ? "#78D304" : "#0364F4"
+                  }
+                />
+              </View>
+              <Text style={styles.date}>{date}</Text>
+            </View>
+          </ListItem.Content>
+        </ListItem>
+      </View>
+    );
   };
 
   render() {
@@ -167,13 +187,12 @@ fetchMoreTransactions = async text => {
             </TouchableOpacity>
           </View>
         </View>
+       
         <View style={styles.lowerContainer}>
           <FlatList
             data={allTransactions}
             renderItem={this.renderItem}
             keyExtractor={(item, index) => index.toString()}
-            onEndReached={() => this.fetchMoreTransactions(searchText)}
-            onEndReachedThreshold={0.7}
           />
         </View>
       </View>
@@ -182,78 +201,77 @@ fetchMoreTransactions = async text => {
 }
 
 const styles = StyleSheet.create({
-  container:{
-    flex :1,
-    justifyContent : 'center',
-    alignItems : 'center',
-    backgroundColor : 'blue'
+  container: {
+    flex: 1,
+    backgroundColor: "#5653D4"
   },
-  upperContainer:{
-    flex:0.2,
-    justifyContent : "center",
-    alignItems : "center"
-  },
-  textinputContainer:{
-    borderWidth:2,
-    borderRadius:10,
-    flexDirection:"row",
-    backgroundColor:"green",
-    borderColor : "white"
-  },
-  textinput:{
-    width:"57%",
-    height:50,
-    padding : 10,
-    borderColor : "white",
-    borderRadius:10,
-    borderWidth:3,
-    fontSize:18,
-    backgroundColor:"purple",
-    fontFamily:"Rajdhani_600SemiBold",
-    color : "white"
-  },
-  scanbutton:{
-    width:100,
-    height : 50,
-    backgroundColor : "green",
-    borderTopRightRadius:10,
-    borderBottonRightRadius:10,
+  upperContainer: {
+    flex: 0.2,
     justifyContent: "center",
-    alignItems:"center"
+    alignItems: "center"
   },
-  scanbuttonText:{
-    fontSize : 24,
-    color : "black",
-    fontFamily : "Rajdhani_600SemiBold",
+  textinputContainer: {
+    borderWidth: 2,
+    borderRadius: 10,
+    flexDirection: "row",
+    backgroundColor: "#9DFD24",
+    borderColor: "#FFFFFF"
   },
-  lowerContainer:{
-    flex:0.8,
-    backgroundColor:"white",
+  textinput: {
+    width: "57%",
+    height: 50,
+    padding: 10,
+    borderColor: "#FFFFFF",
+    borderRadius: 10,
+    borderWidth: 3,
+    fontSize: 18,
+    backgroundColor: "#5653D4",
+    fontFamily: "Rajdhani_600SemiBold",
+    color: "#FFFFFF"
   },
-  title:{
-    fontSize:20,
-    fontFamily:"Rajdhani_600SemiBold"
+  scanbutton: {
+    width: 100,
+    height: 50,
+    backgroundColor: "#9DFD24",
+    borderTopRightRadius: 10,
+    borderBottomRightRadius: 10,
+    justifyContent: "center",
+    alignItems: "center"
   },
-  subtitle:{
-    fontSize:16,
-    fontFamily:"Rajdhani_600SemiBold"
+  scanbuttonText: {
+    fontSize: 24,
+    color: "#0A0101",
+    fontFamily: "Rajdhani_600SemiBold"
   },
-  lowerLeftContainer:{
-    alignSelf:"flex-end",
-    marginTop:-40
+  lowerContainer: {
+    flex: 0.8,
+    backgroundColor: "#FFFFFF"
   },
-  transactionContainer:{
-    alignSelf:"flex-end",
-    justifyContent:"space-evenly",
-    alignItems:"center"
+  title: {
+    fontSize: 20,
+    fontFamily: "Rajdhani_600SemiBold"
   },
-  transactionText:{
-    fontSize:20,
-    fontFamily:"Rajdhani_600SemiBold"
+  subtitle: {
+    fontSize: 16,
+    fontFamily: "Rajdhani_600SemiBold"
   },
-  date:{
-    fontFamily:"Rajdhani_600SemiBold",
-    fontSize:12,
-    paddingTop:5
+  lowerLeftContaiiner: {
+    alignSelf: "flex-end",
+    marginTop: -40
+  },
+  transactionContainer: {
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    alignItems: "center"
+  },
+  transactionText: {
+    fontSize: 20,
+
+    fontFamily: "Rajdhani_600SemiBold"
+  },
+  date: {
+    fontSize: 12,
+    fontFamily: "Rajdhani_600SemiBold",
+    paddingTop: 5
   }
-})
+});
