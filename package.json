@@ -1,34 +1,16 @@
 {
-  "name": "e-library-v2-pro-c74",
-  "version": "1.0.0",
-  "main": "node_modules/expo/AppEntry.js",
-  "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web"
-  },
   "dependencies": {
-    "@expo-google-fonts/rajdhani": "^0.2.2",
-    "@react-navigation/bottom-tabs":"7.15.5",
-    "@react-navigation/native":"7.1.33",
-    "expo": "~46.0.9",
-    "expo-barcode-scanner": "~11.4.0",
-    "expo-font": "~10.2.0",
-    "expo-permissions": "~13.2.0",
-    "expo-status-bar": "~1.4.0",
-    "firebase": "^8.4.1",
-    "react": "18.0.0",
-    "react-dom": "18.0.0",
-    "react-native": "0.69.5",
-    "react-native-elements": "^3.4.2",
-    "react-native-gesture-handler": "~2.5.0",
-    "react-native-screens": "~3.15.0",
-    "react-native-vector-icons": "^9.2.0",
-    "react-native-web": "~0.18.7"
-  },
-  "devDependencies": {
-    "@babel/core": "^7.12.9"
-  },
-  "private": true
+    "@expo/vector-icons": "^15.1.1",
+    "@react-navigation/bottom-tabs": "^7.15.7",
+    "@react-navigation/drawer": "^7.9.6",
+    "@react-navigation/native": "^7.2.0",
+    "@react-navigation/stack": "^7.8.7",
+    "axios": "^1.13.6",
+    "react-native-gesture-handler": "~2.30.0",
+    "react-native-reanimated": "4.2.1",
+    "react-native-safe-area-context": "~5.6.2",
+    "react-native-screens": "~4.23.0",
+    "react-native-vector-icons": "^10.3.0",
+    "react-native-webview": "13.16.0"
+  }
 }
